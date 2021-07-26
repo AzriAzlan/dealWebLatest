@@ -15,14 +15,9 @@ $dealresults = $stmts->fetchAll(PDO::FETCH_ASSOC);
 
 $stmts = $pdo->query("SELECT * FROM users u WHERE u.user_id='$refer'");
 $userresults = $stmts->fetchAll(PDO::FETCH_ASSOC);
-
-
     foreach ($dealresults as $row) {
     foreach($userresults as $user) {
-
-
-
-   echo'<h1 style="color:black; text-align:center; font-size:50px; text-transform: uppercase;">'. htmlentities($row['deal_name']) . '</h1>
+    echo'<h1 style="color:black; text-align:center; font-size:50px; text-transform: uppercase;">'. htmlentities($row['deal_name']) . '</h1>
                 <div class="row" style="border-top-style:solid; border-bottom-style:solid;">
                     <p class="col-lg-6" style="text-align:left;">Promo code: <strong>'. htmlentities($row['promo_code']) . '</strong></p>
                     <p class="col-lg-6" style="text-align:right;"> Expired: '. htmlentities($row['validity']) . '</p>
@@ -85,21 +80,13 @@ $userresults = $stmts->fetchAll(PDO::FETCH_ASSOC);
 
 
 }
-
-
 }
-
 if(isset($_POST['redeem'])) {
         $stmt = $pdo->prepare('INSERT INTO referrals (deal_id,sender_id,receiver_id) VALUES ('.$deal.','.$refer.','.$sharer.')');
         $stmt->execute();
         echo "Sucess";
 }
-
-
 ?>
-
-
-
 <!DOCTYPE html>
 <html>
 <head>

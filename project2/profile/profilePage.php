@@ -89,8 +89,6 @@ if(isset($_POST['redeem'])){
 
     <div class="container">
         <div style="margin-top: 60px;" class="main-body">
-
-
             <div class="row gutters-sm">
                 <div class="col-md-4 mb-3">
                     <div class="card">
@@ -110,10 +108,10 @@ if(isset($_POST['redeem'])){
                     <div class="card mt-3">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                
-                                    <p><i class="fa fa-gift" aria-hidden="true"></i>
-                                        Point:
-                                        <?php 
+
+                                <p><i class="fa fa-gift" aria-hidden="true"></i>
+                                    Point:
+                                    <?php 
                                             $total = 0;
                                             $check = "SELECT COUNT(sender_id) from referrals where sender_id = :uid ";
                                             $statement = $pdo->prepare($check);
@@ -146,29 +144,45 @@ if(isset($_POST['redeem'])){
                                                     'downDID' => htmlentities($details['deal_id'])
                                                 ));
                                                 $results2 = $statement2->fetchAll(PDO::FETCH_ASSOC);
-                                                foreach($results2 as $rows3){
-                                                    $count2 = (int) $rows3['COUNT(A.receiver_id)'];
+                                                foreach($results2 as $rows2){
+                                                    $count2 = (int) $rows2['COUNT(A.receiver_id)'];
                                                     $total = $total + 2 * $count2;
-                                              }
+                                                }
+                                                // 
+                                                $dl3="SELECT A.receiver_id, A.deal_id
+                                                FROM referrals A, referrals B
+                                                WHERE A.sender_id = B.receiver_id AND A.deal_id = B.deal_id 
+                                                and B.receiver_id=:downUID and B.deal_id =:downDID";
+                                                $statedl3rd = $pdo->prepare($dl3);
+                                                $statedl3rd -> execute(array(
+                                                    'downUID' => htmlentities($details['receiver_id']),
+                                                    'downDID' => htmlentities($details['deal_id'])
+                                                ));
+                                                $resultdl3rd = $statedl3rd->fetchAll(PDO::FETCH_ASSOC);
+                                                    for($cnt=0;$cnt<count($resultdl3rd);$cnt++){
+                                                    $details3=$resultdl3rd[$cnt];
+                                                    $check3 = "SELECT COUNT(A.receiver_id)
+                                                    FROM referrals A, referrals B
+                                                    WHERE A.sender_id = B.receiver_id AND A.deal_id = B.deal_id 
+                                                    and B.receiver_id=:downUID and B.deal_id =:downDID";
+                                                    $statement3 = $pdo->prepare($check3);
+                                                    $statement3 -> execute(array(
+                                                        'downUID' => htmlentities($details3['receiver_id']),
+                                                        'downDID' => htmlentities($details3['deal_id'])
+                                                    ));
+                                                    $results3 = $statement3->fetchAll(PDO::FETCH_ASSOC);
+                                                    foreach($results3 as $rows3){
+                                                        $count3 = (int) $rows3['COUNT(A.receiver_id)'];
+                                                        $total = $total + 1 * $count3;
+                                                    }
+                                                }
                                             }
                                             echo $total
-                                            //calculate sender_id 3rd generation
-                                            // $check3 = "SELECT COUNT(sender_id) from referrals where sender_id like '%,':uid'' ";
-                                            // $statement3 = $pdo->prepare($check3);
-                                            // $statement3 -> execute(array(
-                                            //     'uid' => $_SESSION['user_id'],
-                                            // ));
-                                            // $results3 = $statement3->fetchAll(PDO::FETCH_ASSOC);
-                                            // foreach($results3 as $rows3){
-                                            //     $count3 = (int) $rows3['COUNT(sender_id)'];
-                                            //     $total = $total + 1 * $count3;
-                                                
-                                            // }
                                         ?>
-                                        <form method="POST"><button class="btn btn-info" type="submit" name="redeem"
-                                            style="margin:5px">redeem</button></form>
-                                    </p>
-                                
+                                <form method="POST"><button class="btn btn-info" type="submit" name="redeem"
+                                        style="margin:5px">redeem</button></form>
+                                </p>
+
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
 

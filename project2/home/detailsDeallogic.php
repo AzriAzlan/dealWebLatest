@@ -9,7 +9,7 @@ if(!(isset($_GET['dealID'])) && !(isset($_POST['promocode'])) && !(isset($_POST[
     $sharer = $_SESSION['user_id'];
     $referLink = "localhost/dealWebLatest/project2/referral.php?refer=$sharer%26deal=$deal";
     //Display all registered deal
-    $stmts = $pdo->prepare('SELECT d.deal_id,d.deal_name,d.deal_logo,d.promo_code,d.tagline,d.reward,d.reward_unit,d.description,d.validity,d.company_address,d.company_postcode,d.company_country
+    $stmts = $pdo->prepare('SELECT d.landing_page,d.deal_id,d.deal_name,d.deal_logo,d.promo_code,d.tagline,d.reward,d.reward_unit,d.description,d.validity,d.company_address,d.company_postcode,d.company_country
     FROM deal d inner join deal_review dr on d.deal_id=dr.deal_id
     where d.deal_id=:dealID AND dr.deal_status="approved"');
     $stmts -> execute(array(
@@ -60,7 +60,7 @@ if(!(isset($_GET['dealID'])) && !(isset($_POST['promocode'])) && !(isset($_POST[
                 <ul>'. htmlentities($row['reward']). htmlentities($row['reward_unit']) . '</ul>
                 <h5>Address:</h5>
                 <ul>'. htmlentities($row['company_address']).'</br>'. htmlentities($row['company_postcode']) .'</br>'. htmlentities($row['company_country']) .'</ul>';
-                //trigger modal
+                //trigger modal share
                 echo'<div class=" imagesdeal" data-toggle="modal" data-target="#'.htmlentities($row['deal_id']).'">
                         <button class="btn btn-info col-lg-12" style="margin-bottom:20px">Share</button>';
                 //modal
@@ -97,6 +97,39 @@ if(!(isset($_GET['dealID'])) && !(isset($_POST['promocode'])) && !(isset($_POST[
                         </div>
                     </div>
                 </div>
+            </div>';
+
+            //trigger modal redeem
+            echo'<div class=" imagesdeal" data-toggle="modal" data-target="#'.htmlentities($row['promo_code']).'">
+                        <button class="btn col-lg-12" style="margin-bottom:20px;background:none; color:darkcyan; border:solid 1px darkcyan">Redeem</button>';
+            //modal
+            echo
+            '<div id="'.htmlentities($row['promo_code']).'" class="modal fade" role="dialog">
+                <div class="modal-dialog">';
+            //modal content
+            echo
+                '<div class="modal-content">
+                <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">'.htmlentities($row['deal_name']).'</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?data='.htmlentities($row['landing_page']).'&amp;size=200x200"/>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <p>scan me to go to company website</p>
+                        </div> 
+                    </div>
+                <!-- Modal footer -->
+                    <div class="modal-footer d-flex justify-content-center">
+                        <img src="https://www.cognex.com/api/Sitecore/Barcode/Get?data='.htmlentities($row['promo_code']).'&code=BCL_CODE128&width=300&imageType=JPG&foreColor=%23000000&backColor=%23FFFFFF&rotation=RotateNoneFlipNone" width="300" />
+                    </div>
+                </div>
+                </div>
+            </div>
             </div>';
             if (isset($_POST['save'])){
                 $sql = "INSERT INTO saved_deals (user_id,deal_id) VALUES (:userid,:dealid)";
