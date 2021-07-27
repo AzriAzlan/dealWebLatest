@@ -17,30 +17,61 @@ $stmts = $pdo->query("SELECT * FROM users u WHERE u.user_id='$refer'");
 $userresults = $stmts->fetchAll(PDO::FETCH_ASSOC);
     foreach ($dealresults as $row) {
     foreach($userresults as $user) {
-    echo'<h1 style="color:black; text-align:center; font-size:50px; text-transform: uppercase;">'. htmlentities($row['deal_name']) . '</h1>
-                <div class="row" style="border-top-style:solid; border-bottom-style:solid;">
-                    <p class="col-lg-6" style="text-align:left;">Promo code: <strong>'. htmlentities($row['promo_code']) . '</strong></p>
-                    <p class="col-lg-6" style="text-align:right;"> Expired: '. htmlentities($row['validity']) . '</p>
-                </div>
-                <h5>Shared by:</h5>
-                <ul>'. htmlentities($user['user_name']) . '</ul>
-                <h5>Description:</h5>
-                <ul>'. htmlentities($row['description']) . '</ul>
-                <h5>Tagline:</h5>
-                <ul>'. htmlentities($row['tagline']) . '</ul>
-                <h5>Reward Redeem:</h5>
-                <ul>'. htmlentities($row['reward']). htmlentities($row['reward_unit']) . '</ul>
-                <h5>Address:</h5>
-                <ul>'. htmlentities($row['company_address']).'</br>'. htmlentities($row['company_postcode']) .'</br>'. htmlentities($row['company_country']) .'</ul>';
+    echo'
+    <div class="row center">
+        <div class="col-lg-6 d-flex justify-content-center" style="border-right:solid 1px; position:relative">
+            <div class="d-flex justify-content-center" style="position:absolute">
+                <img height=350 width=300 src="data:image/jpeg;base64,'.base64_encode($row['deal_logo']).'"/>
+            </div>
+            <img height=350 width=300 src="savedDeal/Icon/frame.png" style="position:absolute;">
+        </div>
+        <div class="col-lg-6" style="text-align:center">
+            <h1>Here\'s your '.htmlentities($row['deal_name']).' coupon</h1>
+            <p>Use the following promocode at '.htmlentities($row['landing_page']).' to get <strong>'.htmlentities($row['reward']). htmlentities($row['reward_unit']).'</strong> on your purchase</p>
             
-                //redeem
-               echo'<form method="POST">
-                <button name="redeem" class="btn btn-info col-lg-12" style="margin-bottom:20px">Redeem</button>
-                </form>';
+            <h2>Shared by:</h2>
+            <h5>'. htmlentities($user['user_name']) . '</h5>
+            <h2>Promocode:</h2>
+            <h5><strong>'.htmlentities($row['promo_code']).'</strong></h5>
+            <!-- redeem button -->
 
-                //trigger modal
-                echo'<div class=" imagesdeal" data-toggle="modal" data-target="#'.htmlentities($row['deal_id']).'">
-                        <button class="btn btn-info col-lg-12" style="margin-bottom:20px">Share</button>';
+            <div class=" imagesdeal" data-toggle="modal" data-target="#'.htmlentities($row['promo_code']).'">
+                        <button class="btn col-lg-3 btn-info" style="margin-bottom:20px;">Redeem</button>';
+            //modal
+            echo
+            '<div id="'.htmlentities($row['promo_code']).'" class="modal fade" role="dialog">
+                <div class="modal-dialog">';
+            //modal content
+            echo
+                '<div class="modal-content">
+                <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">'.htmlentities($row['deal_name']).'</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?data='.htmlentities($row['landing_page']).'&amp;size=200x200"/>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <p>scan me to go to company website</p>
+                        </div> 
+                    </div>
+                <!-- Modal footer -->
+                    <div class="modal-footer d-flex justify-content-center">
+                        <img src="https://www.cognex.com/api/Sitecore/Barcode/Get?data='.htmlentities($row['promo_code']).'&code=BCL_CODE128&width=300&imageType=JPG&foreColor=%23000000&backColor=%23FFFFFF&rotation=RotateNoneFlipNone" width="300" />
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <form method="POST">
+                <button name="redeem" class="btn btn-info col-lg-3" style="margin-bottom:20px">Redeem</button>
+                </form>
+            <!-- share button -->
+            <div class=" imagesdeal" data-toggle="modal" data-target="#'.htmlentities($row['deal_id']).'">
+                        <button class="btn col-lg-3" style="margin-bottom:20px; background:none; color:darkcyan; border:solid 1px darkcyan">Share</button>';
                 //modal
                 echo
                 '<div id="'.htmlentities($row['deal_id']).'" class="modal fade" role="dialog">
@@ -76,21 +107,20 @@ $userresults = $stmts->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-            </div>';
-
-
+        </div>
+    </div>';
 }
 }
 if(isset($_POST['redeem'])) {
         $stmt = $pdo->prepare('INSERT INTO referrals (deal_id,sender_id,receiver_id) VALUES ('.$deal.','.$refer.','.$sharer.')');
         $stmt->execute();
-        echo "Sucess";
 }
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
-	    <!-- Latest compiled and minified CSS -->
+    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <link rel="stylesheet" href="mycss.css">
@@ -107,12 +137,39 @@ if(isset($_POST['redeem'])) {
         integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous">
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-	<title>Landing</title>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <title>Landing</title>
+
+    <style>
+    .center {
+        padding: 150px 0;
+    }
+    </style>
 </head>
+
 <body>
+    <?php
+    if($sharer==$refer){
+        echo '<!--navigation-->
+        <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">DealShare</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="main-navigation">
+    
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../project2/index.php"><button class="btn btn-success">Login</button></a>
+                    </li>
+                </ul>
+        </nav>';
+    }
+    else
+    ?>
 
 
 
 </body>
+
 </html>

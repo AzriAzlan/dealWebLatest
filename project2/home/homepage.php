@@ -57,11 +57,8 @@ session_start();
                 </li>
                  <li class="nav-item">
                     <a href="../profile/profilePage.php"><img width=35; src="https://icon-library.com/images/profile-icon-white/profile-icon-white-3.jpg"></a>
-                    
                 </li>
-
             </ul>
-          
     </nav>
 
 
@@ -80,13 +77,10 @@ session_start();
 
 </div>
 	
-	</header>
+</header>
 
 <?php
-
-
     ?>
-
     <!--Content-->
                 <?php
                     if(isset($_POST['dealID'])){
